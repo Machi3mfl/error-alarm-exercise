@@ -24,20 +24,26 @@ the end of the log file.
 
 3. We never want to receive more than one email notification per minute.
 
-# Flow diagram
+# Solution
+
+The following flow chart represent the Error Alarm exercise solution.
 
 ```mermaid
 flowchart
 
-Start -->|throw error| B(New Error)
-B --> C(Log Error)
-C --> D(Count latest errors from file)
-D --> E(Send email alarm?)
-E -->|yes| F(Send email with errors)
-F --> H(Reset Alarm)
-H --> I(Reset Counter)
-E -->|no| L(Reset Alarm)
-L --> M(Reset Counter)
-I --> N(Wait for next error)
-M --> N(Wait for next error)
+A(Waiting for new error) --> B(New Error)
+B --> C(Check Error List length)
+C --> D{Error List lenght <= 1?}
+D -->|yes| F(Call logError)
+F --> H(Add error to Error List)
+H --> A
+D -->|no| I(Get diff time - Current error & first in Error List)
+I --> J{Diff <=60s}
+J -->|yes| F
+J -->|no| K(Check Error List length)
+K --> L{Error List length >=10?}
+L -->|no| M(Clear Error List)
+M --> F
+L -->|yes| N(Send Error List by email)
+N --> M
 ```
